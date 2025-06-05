@@ -1,0 +1,32 @@
+<package>
+  <name>bumper2pointcloud</name>
+  <version>0.1</version>
+  <description>
+    Bumper to pointcloud nodelet based on https://github.com/yujinrobot/kobuki_core 
+    Publish bumpers sensors as points in a pointcloud, so navistack can use them
+    for poor-man navigation. Implemented as a nodelet intended to run together with open_mower.
+  </description>
+  <author email="viper@vipernet.hu">Tamas DAJKA</author>
+  <maintainer email="viper@vipernet.hu">Tamas DAJKA</maintainer>
+  <license>BSD</license>
+  <url type="bugtracker">https://github.com/v1pr/bumper2pointcloud/issues</url>
+  <url type="repository">https://github.com/v1pr/bumper2pointcloud</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>mower_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>pluginlib</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>mower_msgs</run_depend>
+  
+  <export>
+    <nodelet plugin="${prefix}/plugins/nodelet_plugins.xml"/>
+  </export>
+</package>
