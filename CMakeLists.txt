@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(open_mower)
+project(bumper2pointcloud)
 find_package(catkin REQUIRED COMPONENTS roscpp nodelet pluginlib sensor_msgs mower_msgs)
 
 catkin_package(
