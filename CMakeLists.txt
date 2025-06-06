@@ -3,7 +3,7 @@ project(bumper2pointcloud)
 find_package(catkin REQUIRED COMPONENTS roscpp nodelet pluginlib sensor_msgs mower_msgs)
 
 catkin_package(
-   INCLUDE_DIRS include
+   INCLUDE_DIRS src
    LIBRARIES bumper2pointcloud_nodelet
    CATKIN_DEPENDS roscpp nodelet pluginlib sensor_msgs mower_msgs
 )
