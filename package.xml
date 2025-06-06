@@ -1,6 +1,6 @@
 <package>
   <name>bumper2pointcloud</name>
-  <version>0.1</version>
+  <version>0.1.0</version>
   <description>
     Bumper to pointcloud nodelet based on https://github.com/yujinrobot/kobuki_core 
     Publish bumpers sensors as points in a pointcloud, so navistack can use them
