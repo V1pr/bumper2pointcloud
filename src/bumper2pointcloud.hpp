@@ -59,23 +59,21 @@
  ** Namespace
  *****************************************************************************/
 
-namespace bumper2pointcloud
 {
 
 /**
  * @brief bumper2pointcloudNodelet class declaration
  */
-class Bumper2PointcloudNodelet : public nodelet::Nodelet
+class Bumper2PointcloudNode
 {
 public:
-  Bumper2PointcloudNodelet()
+  Bumper2PointcloudNode()
     : P_INF_X(+100*sin(0.34906585)),
       P_INF_Y(+100*cos(0.34906585)),
       N_INF_Y(-100*cos(0.34906585)),
       ZERO(0), prev_rbump(0), prev_lbump(0) { }
-  ~Bumper2PointcloudNodelet() { }
-
-  void onInit();
+  
+  ~Bumper2PointcloudNode() { }
 
 private:
   const float P_INF_X;  // somewhere out of reach from the robot (positive x)
@@ -104,6 +102,6 @@ private:
   void BumberCB(const mower_msgs::Emergency::ConstPtr& msg);
 };
 
-} // namespace bumper2pointcloud
+}
 
 #endif // _BUMPER2POINTCLOUD_HPP_

@@ -11,65 +11,18 @@
 ** Includes
 *****************************************************************************/
 
+#include <ros/ros.h>
+#include <sensor_msgs/PointCloud2.h>
+
 #include <pluginlib/class_list_macros.h>
 
 #include "bumper2pointcloud.hpp"
 
-namespace bumper2pointcloud
+class Bumper2PointcloudNode {
+
+void Bumper2PointcloudNode()
 {
-
-void Bumper2PointcloudNodelet::BumperCB(const mower_msgs::Emergency::ConstPtr& msg)
-{
-  if (pointcloud_pub_.getNumSubscribers() == 0)
-    return;
-
-  // We publish just one "no events" pc (with all three points far away) and stop spamming when bumper/cliff conditions disappear
-  if (! msg->lbump && ! prev_lbump && ! $msg->rbump && ! $prev_rbump )
-    return;
-
-  prev_lbump = msg->lbump;
-  prev_rbump  = msg->rbump;
-
-  // We replicate the sensors order of bumper/cliff event messages: LEFT = 0, CENTER = 1 and RIGHT = 2
-  // For any of {left/center/right} with no bumper/cliff event, we publish a faraway point that won't get used 
-  if ( msg->lbump )
-  {
-    memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[0].offset], &p_side_x_, sizeof(float));
-    memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[1].offset], &p_side_y_, sizeof(float));
-  }
-  else
-  {
-    memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[0].offset], &P_INF_X, sizeof(float));
-    memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[1].offset], &P_INF_Y, sizeof(float));
-  }
-
-  if ( msg->lbump && msg->rbump )
-  {
-    memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[0].offset], &pc_radius_, sizeof(float));
-  }
-  else
-  {
-    memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[0].offset], &P_INF_X, sizeof(float));
-  }
-
-  if ( sg->rbump )
-  {
-    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[0].offset], &p_side_x_, sizeof(float));
-    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[1].offset], &n_side_y_, sizeof(float));
-  }
-  else
-  {
-    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[0].offset], &P_INF_X, sizeof(float));
-    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[1].offset], &N_INF_Y, sizeof(float));
-  }
-
-  pointcloud_.header.stamp = msg->header.stamp;
-  pointcloud_pub_.publish(pointcloud_);
-}
-
-void Bumper2PointcloudNodelet::onInit()
-{
-  ros::NodeHandle nh = this->getPrivateNodeHandle();
+  ros::NodeHandle nh;
 
   // Bumper pointcloud distance to base frame; should be something like the robot radius plus
   // costmap resolution plus an extra to cope with robot inertia. This is a bit tricky parameter: if
@@ -129,12 +82,67 @@ void Bumper2PointcloudNodelet::onInit()
   memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[2].offset], &pc_height_, sizeof(float));
 
   pointcloud_pub_  = nh.advertise <sensor_msgs::PointCloud2> ("pointcloud", 10);
-  emergency_sub_ = nh.subscribe("ll/emergency", 10, &Bumper2PointcloudNodelet::BumperCB, this);
+  emergency_sub_ = nh.subscribe("/ll/emergency", 10, &Bumper2PointcloudNodelet::BumperCB, this);
 
   ROS_INFO("Bumper pointcloud configured at distance %f and height %f from base frame", pc_radius_, pc_height_);
 }
 
-} // namespace bumper2pointcloud
+// callback
+void Bumper2PointcloudNodelet::BumperCB(const mower_msgs::Emergency::ConstPtr& msg)
+{
+  if (pointcloud_pub_.getNumSubscribers() == 0)
+    return;
 
+  // We publish just one "no events" pc (with all three points far away) and stop spamming when bumper/cliff conditions disappear
+  if (! msg->lbump && ! prev_lbump && ! $msg->rbump && ! $prev_rbump )
+    return;
 
-PLUGINLIB_EXPORT_CLASS(Bumper2Pointcloud::Bumper2PointcloudNodelet, nodelet::Nodelet);
+  prev_lbump = msg->lbump;
+  prev_rbump  = msg->rbump;
+
+  // We replicate the sensors order of bumper/cliff event messages: LEFT = 0, CENTER = 1 and RIGHT = 2
+  // For any of {left/center/right} with no bumper/cliff event, we publish a faraway point that won't get used 
+  if ( msg->lbump )
+  {
+    memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[0].offset], &p_side_x_, sizeof(float));
+    memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[1].offset], &p_side_y_, sizeof(float));
+  }
+  else
+  {
+    memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[0].offset], &P_INF_X, sizeof(float));
+    memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[1].offset], &P_INF_Y, sizeof(float));
+  }
+
+  if ( msg->lbump && msg->rbump )
+  {
+    memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[0].offset], &pc_radius_, sizeof(float));
+  }
+  else
+  {
+    memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[0].offset], &P_INF_X, sizeof(float));
+  }
+
+  if ( sg->rbump )
+  {
+    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[0].offset], &p_side_x_, sizeof(float));
+    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[1].offset], &n_side_y_, sizeof(float));
+  }
+  else
+  {
+    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[0].offset], &P_INF_X, sizeof(float));
+    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[1].offset], &N_INF_Y, sizeof(float));
+  }
+
+  pointcloud_.header.stamp = msg->header.stamp;
+  pointcloud_pub_.publish(pointcloud_);
+}
+
+}; // end of class
+
+// Main function
+int main(int argc, char** argv) {
+    ros::init(argc, argv, "bumper2pointcloud");
+    Bumper2PointcloudNode node;
+    ros::spin(); // Keep it continous / Hoia node pidevalt töös
+    return 0;
+}
