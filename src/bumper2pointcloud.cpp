@@ -18,7 +18,10 @@
 namespace bumper2pointcloud
 {
     
-  Bumper2PointcloudNode::Bumper2PointcloudNode() 
+  Bumper2PointcloudNode::Bumper2PointcloudNode() : P_INF_X(+100*sin(0.34906585)),
+        P_INF_Y(+100*cos(0.34906585)),
+        N_INF_Y(-100*cos(0.34906585)),
+        ZERO(0), prev_rbump(0), prev_lbump(0)
   {
     ros::NodeHandle nh;
 
