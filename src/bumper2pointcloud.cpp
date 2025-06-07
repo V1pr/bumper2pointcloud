@@ -1,7 +1,7 @@
 /**
  * @file /src/bumper2pointcloud.cpp
  *
- * @brief Bumper to pointcloud nodelet class implementation.
+ * @brief Bumper to pointcloud node class implementation.
  *
  * @author Tamas DAJKA, work based on Jorge Santos @ Yujin Robot's work
  *
@@ -83,7 +83,7 @@ namespace bumper2pointcloud
     memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[2].offset], &pc_height_, sizeof(float));
 
     pointcloud_pub_  = nh.advertise <sensor_msgs::PointCloud2> ("pointcloud", 10);
-    emergency_sub_ = nh.subscribe("/ll/emergency", 10, &Bumper2PointcloudNodelet::BumperCB, this);
+    emergency_sub_ = nh.subscribe("/ll/emergency", 10, &Bumper2PointcloudNode::BumperCB, this);
 
     ROS_INFO("Bumper pointcloud configured at distance %f and height %f from base frame", pc_radius_, pc_height_);
   }

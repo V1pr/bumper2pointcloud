@@ -32,10 +32,10 @@
 /**
  * @file /include/bumper2pointcloud/bumper2pointcloud.hpp
  *
- * @brief Bumper/cliff to pointcloud nodelet class declaration.
+ * @brief Bumper/cliff to pointcloud node class declaration.
  *
  * Publish bumpers and cliff sensors events as points in a pointcloud, so navistack can use them
- * for poor-man navigation. Implemented as a nodelet intended to run together with kobuki_node.
+ * for poor-man navigation. Implemented as a node intended to run together with kobuki_node.
  *
  * @author Jorge Santos, Yujin Robot
  *
@@ -57,7 +57,7 @@
  *****************************************************************************/
 
 /**
- * @brief bumper2pointcloudNodelet class declaration
+ * @brief bumper2pointcloudNode class declaration
  */
  
 namespace bumper2pointcloud
