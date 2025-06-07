@@ -61,43 +61,47 @@
 /**
  * @brief bumper2pointcloudNodelet class declaration
  */
-class Bumper2PointcloudNode
+ 
+namespace bumper2pointcloud
 {
-public:
-  Bumper2PointcloudNode()
-    : P_INF_X(+100*sin(0.34906585)),
-      P_INF_Y(+100*cos(0.34906585)),
-      N_INF_Y(-100*cos(0.34906585)),
-      ZERO(0), prev_rbump(0), prev_lbump(0) { }
-  
-  ~Bumper2PointcloudNode() { }
 
-private:
-  const float P_INF_X;  // somewhere out of reach from the robot (positive x)
-  const float P_INF_Y;  // somewhere out of reach from the robot (positive y)
-  const float N_INF_Y;  // somewhere out of reach from the robot (negative y)
-  const float ZERO;
+  class Bumper2PointcloudNode
+  {
+  public:
+    Bumper2PointcloudNode()
+      : P_INF_X(+100*sin(0.34906585)),
+        P_INF_Y(+100*cos(0.34906585)),
+        N_INF_Y(-100*cos(0.34906585)),
+        ZERO(0), prev_rbump(0), prev_lbump(0) { }
+    
+    ~Bumper2PointcloudNode() { }
 
-  uint8_t prev_rbump;
-  uint8_t prev_lbump;
+  private:
+    const float P_INF_X;  // somewhere out of reach from the robot (positive x)
+    const float P_INF_Y;  // somewhere out of reach from the robot (positive y)
+    const float N_INF_Y;  // somewhere out of reach from the robot (negative y)
+    const float ZERO;
 
-  float pc_radius_;
-  float pc_height_;
-  float p_side_x_;
-  float p_side_y_;
-  float n_side_y_;
+    uint8_t prev_rbump;
+    uint8_t prev_lbump;
 
-  ros::Publisher  pointcloud_pub_;
-  ros::Subscriber emergency_sub_;
+    float pc_radius_;
+    float pc_height_;
+    float p_side_x_;
+    float p_side_y_;
+    float n_side_y_;
 
-  sensor_msgs::PointCloud2 pointcloud_;
+    ros::Publisher  pointcloud_pub_;
+    ros::Subscriber emergency_sub_;
 
-  /**
-   * @brief Core sensors state structure callback
-   * @param msg incoming topic message
-   */
-  void BumberCB(const mower_msgs::Emergency::ConstPtr& msg);
-};
+    sensor_msgs::PointCloud2 pointcloud_;
 
+    /**
+     * @brief Core sensors state structure callback
+     * @param msg incoming topic message
+     */
+    void BumberCB(const mower_msgs::Emergency::ConstPtr& msg);
+  };
+}; // end namespace
 
 #endif // _BUMPER2POINTCLOUD_HPP_
