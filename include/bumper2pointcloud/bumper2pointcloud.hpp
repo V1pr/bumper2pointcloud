@@ -94,7 +94,7 @@ namespace bumper2pointcloud
      * @brief Core sensors state structure callback
      * @param msg incoming topic message
      */
-    void BumberCB(const mower_msgs::Emergency::ConstPtr& msg);
+    void BumperCB(const mower_msgs::Emergency::ConstPtr& msg);
   };
 }; // end namespace
 
