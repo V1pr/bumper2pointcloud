@@ -49,7 +49,6 @@
  *****************************************************************************/
 
 #include <ros/ros.h>
-#include <node/node.h>
 
 #include <sensor_msgs/PointCloud2.h>
 
