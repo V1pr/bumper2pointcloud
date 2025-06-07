@@ -49,7 +49,7 @@
  *****************************************************************************/
 
 #include <ros/ros.h>
-#include <nodelet/nodelet.h>
+#include <node/node.h>
 
 #include <sensor_msgs/PointCloud2.h>
 
@@ -59,20 +59,13 @@
  ** Namespace
  *****************************************************************************/
 
-{
-
 /**
  * @brief bumper2pointcloudNodelet class declaration
  */
 class Bumper2PointcloudNode
 {
 public:
-  Bumper2PointcloudNode()
-    : P_INF_X(+100*sin(0.34906585)),
-      P_INF_Y(+100*cos(0.34906585)),
-      N_INF_Y(-100*cos(0.34906585)),
-      ZERO(0), prev_rbump(0), prev_lbump(0) { }
-  
+  Bumper2PointcloudNode() { }
   ~Bumper2PointcloudNode() { }
 
 private:
@@ -102,6 +95,5 @@ private:
   void BumberCB(const mower_msgs::Emergency::ConstPtr& msg);
 };
 
-}
 
 #endif // _BUMPER2POINTCLOUD_HPP_

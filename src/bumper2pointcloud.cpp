@@ -18,9 +18,10 @@
 
 #include "bumper2pointcloud.hpp"
 
-class Bumper2PointcloudNode {
-
-void Bumper2PointcloudNode()
+class Bumper2PointcloudNode::Bumper2PointcloudNode() : P_INF_X(+100*sin(0.34906585)),
+      P_INF_Y(+100*cos(0.34906585)),
+      N_INF_Y(-100*cos(0.34906585)),
+      ZERO(0), prev_rbump(0), prev_lbump(0)
 {
   ros::NodeHandle nh;
 
@@ -88,13 +89,13 @@ void Bumper2PointcloudNode()
 }
 
 // callback
-void Bumper2PointcloudNodelet::BumperCB(const mower_msgs::Emergency::ConstPtr& msg)
+void Bumper2PointcloudNode::BumperCB(const mower_msgs::Emergency::ConstPtr& msg)
 {
   if (pointcloud_pub_.getNumSubscribers() == 0)
     return;
 
   // We publish just one "no events" pc (with all three points far away) and stop spamming when bumper/cliff conditions disappear
-  if (! msg->lbump && ! prev_lbump && ! $msg->rbump && ! $prev_rbump )
+  if (! msg->lbump && ! prev_lbump && ! msg->rbump && ! prev_rbump )
     return;
 
   prev_lbump = msg->lbump;
@@ -122,7 +123,7 @@ void Bumper2PointcloudNodelet::BumperCB(const mower_msgs::Emergency::ConstPtr& m
     memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[0].offset], &P_INF_X, sizeof(float));
   }
 
-  if ( sg->rbump )
+  if ( msg->rbump )
   {
     memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[0].offset], &p_side_x_, sizeof(float));
     memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[1].offset], &n_side_y_, sizeof(float));
@@ -136,8 +137,6 @@ void Bumper2PointcloudNodelet::BumperCB(const mower_msgs::Emergency::ConstPtr& m
   pointcloud_.header.stamp = msg->header.stamp;
   pointcloud_pub_.publish(pointcloud_);
 }
-
-}; // end of class
 
 // Main function
 int main(int argc, char** argv) {
