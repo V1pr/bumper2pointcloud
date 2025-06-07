@@ -11,12 +11,9 @@
 ** Includes
 *****************************************************************************/
 
-#include <ros/ros.h>
-#include <sensor_msgs/PointCloud2.h>
+#include <bumper2pointcloud/bumper2pointcloud.hpp>
 
 #include <pluginlib/class_list_macros.h>
-
-#include <bumper2pointcloud/bumper2pointcloud.hpp>
 
 namespace bumper2pointcloud {    
   Bumper2PointcloudNode::Bumper2PointcloudNode() 
@@ -140,7 +137,7 @@ namespace bumper2pointcloud {
 // Main function
 int main(int argc, char** argv) {
     ros::init(argc, argv, "bumper2pointcloud");
-    Bumper2PointcloudNode node;
+    bumper2pointcloud::Bumper2PointcloudNode node;
     ros::spin(); // Keep it continous / Hoia node pidevalt töös
     return 0;
 }

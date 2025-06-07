@@ -103,10 +103,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES open_mower_radar_integration
-#  CATKIN_DEPENDS mower_msgs pcl_conversions pcl_ros roscpp sensor_msgs visualization_msgs
-#  DEPENDS system_lib
+  INCLUDE_DIRS include
+  LIBRARIES bumper2pointcloud
+  CATKIN_DEPENDS mower_msgs roscpp sensor_msgs
+  DEPENDS system_lib
 )
 
 

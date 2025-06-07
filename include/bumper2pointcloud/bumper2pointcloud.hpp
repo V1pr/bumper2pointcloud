@@ -30,7 +30,7 @@
  */
 
 /**
- * @file /src/bumper2pointcloud.hpp
+ * @file /include/bumper2pointcloud/bumper2pointcloud.hpp
  *
  * @brief Bumper/cliff to pointcloud nodelet class declaration.
  *
@@ -49,9 +49,7 @@
  *****************************************************************************/
 
 #include <ros/ros.h>
-
 #include <sensor_msgs/PointCloud2.h>
-
 #include <mower_msgs/Emergency.h>
 
 /*****************************************************************************
@@ -72,7 +70,7 @@ namespace bumper2pointcloud
       : P_INF_X(+100*sin(0.34906585)),
         P_INF_Y(+100*cos(0.34906585)),
         N_INF_Y(-100*cos(0.34906585)),
-        ZERO(0), prev_rbump(0), prev_lbump(0) { }
+        ZERO(0), prev_rbump(0), prev_lbump(0);
     
     ~Bumper2PointcloudNode() { }
 
