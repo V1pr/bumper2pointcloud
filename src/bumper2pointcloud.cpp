@@ -134,7 +134,7 @@ namespace bumper2pointcloud
       memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[1].offset], &N_INF_Y, sizeof(float));
     }
 
-    pointcloud_.header.stamp = msg->header.stamp;
+    pointcloud_.header.stamp = msg->stamp;
     pointcloud_pub_.publish(pointcloud_);
   }
 }
