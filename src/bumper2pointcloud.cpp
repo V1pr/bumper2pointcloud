@@ -15,7 +15,9 @@
 
 #include <pluginlib/class_list_macros.h>
 
-namespace bumper2pointcloud {    
+namespace bumper2pointcloud
+{
+    
   Bumper2PointcloudNode::Bumper2PointcloudNode() 
   {
     ros::NodeHandle nh;
