@@ -32,7 +32,7 @@ namespace bumper2pointcloud
     // them will probably fail.
 
 //    std::string base_link_frame;
-//  double r, h, angle;
+    double r, h, angle;
     nh.param("pointcloud_radius", r, 0.25); pc_radius_ = r;
     nh.param("pointcloud_height", h, 0.04); pc_height_ = h;
     nh.param("side_point_angle", angle, 0.34906585);  pc_angle_ = angle;
