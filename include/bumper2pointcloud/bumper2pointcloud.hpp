@@ -76,14 +76,28 @@ namespace bumper2pointcloud
     const float N_INF_Y;  // somewhere out of reach from the robot (negative y)
     const float ZERO;
 
-    uint8_t prev_rbump;
-    uint8_t prev_lbump;
+    bool prev_rbump;
+    bool prev_lbump;
+    
+    // additional bumper attributes
+    std::string bumper_left_frame_;
+    std::string bumper_right_frame_;
+    std::string base_frame_
 
     float pc_radius_;
     float pc_height_;
     float p_side_x_;
     float p_side_y_;
     float n_side_y_;
+    float distance_x_;
+    float distance_y_;
+
+    // tf transformation between base_frame and bumper frames
+    float bumper_frame_left_x = 0.0;
+    float bumper_frame_left_y = 0.0;
+    float bumper_frame_right_x = 0.0;
+    float bumper_frame_right_y = 0.0;
+    tf2_ros::Buffer tfBuffer;   
 
     ros::Publisher  pointcloud_pub_;
     ros::Subscriber emergency_sub_;
@@ -95,6 +109,14 @@ namespace bumper2pointcloud
      * @param msg incoming topic message
      */
     void BumperCB(const mower_msgs::Emergency::ConstPtr& msg);
+
+    /**
+    * @brief transformation betweeb base link and bumper frame
+    *
+    */
+    void get_tf_bumper();
+    
+    // ToDo: dynamic reconfiguration support
   };
 }; // end namespace
 

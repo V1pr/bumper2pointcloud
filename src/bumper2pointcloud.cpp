@@ -30,24 +30,25 @@ namespace bumper2pointcloud
     // it's too low, costmap will ignore this pointcloud (the robot footprint runs over the hit obstacle),
     // but if it's too big, hit obstacles will be mapped too far from the robot and the navigation around
     // them will probably fail.
-    
-    // TODO use URDF and/or TF?
-    
-    std::string base_link_frame;
-    double r, h, angle;
-    nh.param("pointcloud_radius", r, 0.25); pc_radius_ = r;
-    nh.param("pointcloud_height", h, 0.04); pc_height_ = h;
-    nh.param("side_point_angle", angle, 0.34906585); 
-    nh.param<std::string>("base_link_frame", base_link_frame, "base_link");
+
+//    std::string base_link_frame;
+//  double r, h, angle;
+//    nh.param("pointcloud_radius", r, 0.25); pc_radius_ = r;
+//    nh.param("pointcloud_height", h, 0.04); pc_height_ = h;
+//    nh.param("side_point_angle", angle, 0.34906585); 
+    nh.param<std::string>("bumper_left_frame", bumper_left_frame_, "bumper_left");
+    nh.param<std::string>("bumper_right_frame", bumper_right_frame_, "bumper_right");
+    nh.param<std::string>("base_frame", base_frame_, "base_link");
+    //nh.param<std::string>("base_link_frame", base_link_frame, "base_link");
 
     // Lateral points x/y coordinates; we need to store float values to memcopy later
-    p_side_x_ = + pc_radius_*sin(angle); // angle degrees from vertical
-    p_side_y_ = + pc_radius_*cos(angle); // angle degrees from vertical
-    n_side_y_ = - pc_radius_*cos(angle); // angle degrees from vertical
+    p_side_x_ = + pc_radius_*sin(pc_angle_); // angle degrees from vertical
+    p_side_y_ = + pc_radius_*cos(pc_angle_); // angle degrees from vertical
+    n_side_y_ = - pc_radius_*cos(pc_angle_); // angle degrees from vertical
 
     // Prepare constant parts of the pointcloud message to be  published
-    pointcloud_.header.frame_id = base_link_frame;
-    pointcloud_.width  = 3;
+    pointcloud_.header.frame_id = base_frame;
+    pointcloud_.width  = 2;
     pointcloud_.height = 1;
     pointcloud_.fields.resize(3);
 
@@ -68,23 +69,28 @@ namespace bumper2pointcloud
     pointcloud_.point_step = offset;
     pointcloud_.row_step   = pointcloud_.point_step * pointcloud_.width;
 
-    pointcloud_.data.resize(3 * pointcloud_.point_step);
+    // width * point_step
+    pointcloud_.data.resize(2 * pointcloud_.point_step);
     pointcloud_.is_bigendian = false;
     pointcloud_.is_dense     = true;
 
     // Bumper/cliff "points" fix coordinates (the others depend on sensor activation/deactivation)
 
     // y: always 0 for central bumper
-    memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[1].offset], &ZERO, sizeof(float));
+    //memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[1].offset], &ZERO, sizeof(float));
 
+    // Bumper "points" fix coordinates (the others depend on sensor activation/deactivation)
     // z: constant elevation from base frame
     memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[2].offset], &pc_height_, sizeof(float));
     memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[2].offset], &pc_height_, sizeof(float));
-    memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[2].offset], &pc_height_, sizeof(float));
+    //memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[2].offset], &pc_height_, sizeof(float));
 
     pointcloud_pub_  = nh.advertise <sensor_msgs::PointCloud2> ("/sensors/bumper_pointcloud", 10);
+    // the bumper info is coming from as emergency
     emergency_sub_ = nh.subscribe("/ll/emergency", 10, &Bumper2PointcloudNode::BumperCB, this);
 
+    // get tf between base_frame and bummper_frames
+    get_tf_bumper();
     ROS_INFO("Bumper pointcloud configured at distance %f and height %f from base frame", pc_radius_, pc_height_);
   }
 
@@ -105,8 +111,10 @@ namespace bumper2pointcloud
     // For any of {left/center/right} with no bumper/cliff event, we publish a faraway point that won't get used 
     if ( msg->lbump )
     {
-      memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[0].offset], &p_side_x_, sizeof(float));
-      memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[1].offset], &p_side_y_, sizeof(float));
+      distance_x_ = p_side_x_ + bumper_frame_left_x;
+      distance_y_ = bumper_frame_left_y + p_side_y_;
+      memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[0].offset], &distance_x_, sizeof(float));
+      memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[1].offset], &distance_y_, sizeof(float));
     }
     else
     {
@@ -114,6 +122,8 @@ namespace bumper2pointcloud
       memcpy(&pointcloud_.data[0 * pointcloud_.point_step + pointcloud_.fields[1].offset], &P_INF_Y, sizeof(float));
     }
 
+    /*
+    we don't fake central bumber now
     if ( msg->lbump && msg->rbump )
     {
       memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[0].offset], &pc_radius_, sizeof(float));
@@ -122,11 +132,14 @@ namespace bumper2pointcloud
     {
       memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[0].offset], &P_INF_X, sizeof(float));
     }
+    */
 
     if ( msg->rbump )
     {
-      memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[0].offset], &p_side_x_, sizeof(float));
-      memcpy(&pointcloud_.data[2 * pointcloud_.point_step + pointcloud_.fields[1].offset], &n_side_y_, sizeof(float));
+      distance_x_ = p_side_x_ + bumper_frame_right_x;
+      distance_y_ = bumper_frame_right_y + p_side_y_;
+      memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[0].offset], &distance_x_, sizeof(float));
+      memcpy(&pointcloud_.data[1 * pointcloud_.point_step + pointcloud_.fields[1].offset], &distance_y_, sizeof(float));
     }
     else
     {
@@ -137,6 +150,36 @@ namespace bumper2pointcloud
     pointcloud_.header.stamp = msg->stamp;
     pointcloud_pub_.publish(pointcloud_);
   }
+  
+  // Get transformation between base_link and bumper frames to calculate point location
+    void Bumper2PointcloudNode::get_tf_bumper()
+    {
+        tf2_ros::TransformListener tfListener(tfBuffer);
+        geometry_msgs::TransformStamped transformStamped;
+        try
+        {
+            transformStamped = tfBuffer.lookupTransform(base_frame_, bumper_left_frame_, ros::Time(0), ros::Duration(3.0));
+            bumper_frame_left_x = transformStamped.transform.translation.x;
+            bumper_frame_left_y = transformStamped.transform.translation.y;
+        }
+        catch (tf2::TransformException &ex)
+        {
+            ROS_WARN("%s", ex.what());
+        }
+
+        try
+        {
+            transformStamped = tfBuffer.lookupTransform(base_frame_, bumper_right_frame_, ros::Time(0), ros::Duration(3.0));
+            bumper_frame_right_x = transformStamped.transform.translation.x;
+            bumper_frame_right_y = transformStamped.transform.translation.y;
+        }
+        catch (tf2::TransformException &ex)
+        {
+            ROS_WARN("%s", ex.what());
+        } 
+       
+    }
+
 }
 
 // Main function
