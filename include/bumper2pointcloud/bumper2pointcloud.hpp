@@ -51,6 +51,8 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <mower_msgs/Emergency.h>
+#include <tf2_ros/transform_listener.h>
+#include <geometry_msgs/TransformStamped.h>
 
 /*****************************************************************************
  ** Namespace
@@ -82,7 +84,7 @@ namespace bumper2pointcloud
     // additional bumper attributes
     std::string bumper_left_frame_;
     std::string bumper_right_frame_;
-    std::string base_frame_
+    std::string base_frame_;
 
     float pc_radius_;
     float pc_height_;
