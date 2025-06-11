@@ -33,9 +33,9 @@ namespace bumper2pointcloud
 
 //    std::string base_link_frame;
 //  double r, h, angle;
-//    nh.param("pointcloud_radius", r, 0.25); pc_radius_ = r;
-//    nh.param("pointcloud_height", h, 0.04); pc_height_ = h;
-//    nh.param("side_point_angle", angle, 0.34906585); 
+    nh.param("pointcloud_radius", r, 0.25); pc_radius_ = r;
+    nh.param("pointcloud_height", h, 0.04); pc_height_ = h;
+    nh.param("side_point_angle", angle, 0.34906585);  pc_angle_ = angle;
     nh.param<std::string>("bumper_left_frame", bumper_left_frame_, "bumper_left");
     nh.param<std::string>("bumper_right_frame", bumper_right_frame_, "bumper_right");
     nh.param<std::string>("base_frame", base_frame_, "base_link");
@@ -47,7 +47,7 @@ namespace bumper2pointcloud
     n_side_y_ = - pc_radius_*cos(pc_angle_); // angle degrees from vertical
 
     // Prepare constant parts of the pointcloud message to be  published
-    pointcloud_.header.frame_id = base_frame;
+    pointcloud_.header.frame_id = base_frame_;
     pointcloud_.width  = 2;
     pointcloud_.height = 1;
     pointcloud_.fields.resize(3);

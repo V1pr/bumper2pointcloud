@@ -88,6 +88,7 @@ namespace bumper2pointcloud
 
     float pc_radius_;
     float pc_height_;
+    float pc_angle_;
     float p_side_x_;
     float p_side_y_;
     float n_side_y_;
